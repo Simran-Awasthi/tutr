@@ -34,7 +34,7 @@ const Home = () => {
               <CardHeader>
                 <CardTitle>Problem 207</CardTitle>
                 <CardDescription>
-                  <p>
+                  <span>
                     Start with this design and transform it into a functional
                     project using HTML, CSS, and JavaScript. If you want to go
                     the extra mile, expand upon it, and integrate your unique
@@ -43,7 +43,7 @@ const Home = () => {
                     developer ingenuity. The most creative projects will be
                     showcased on our featured page and on top of your profile
                     page.
-                  </p>
+                  </span>
                 </CardDescription>
               </CardHeader>
               <CardContent className="w-full relative bg-zinc-50">
@@ -83,7 +83,7 @@ const Home = () => {
               <CardHeader>
                 <CardTitle>Problem 207</CardTitle>
                 <CardDescription>
-                  <p>
+                  <span>
                     Start with this design and transform it into a functional
                     project using HTML, CSS, and JavaScript. If you want to go
                     the extra mile, expand upon it, and integrate your unique
@@ -92,7 +92,7 @@ const Home = () => {
                     developer ingenuity. The most creative projects will be
                     showcased on our featured page and on top of your profile
                     page.
-                  </p>
+                  </span>
                 </CardDescription>
               </CardHeader>
               <CardContent className="w-full relative bg-zinc-50">
