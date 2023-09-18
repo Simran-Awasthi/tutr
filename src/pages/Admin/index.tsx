@@ -18,12 +18,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
-import { storage } from "@/firebase";
+import { auth, db, firestore, storage } from "@/firebase";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { CalendarIcon } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { v4 } from "uuid";
 
@@ -34,8 +35,11 @@ const index = () => {
     description: "",
     cost: "",
     date: "",
-    picture: "",
   });
+  const [imgs, setImgs] = useState<FileList | null>(null);
+  const [date, setDate] = React.useState<Date>();
+  const [open, setOpen] = useState(false);
+
   const handleInputChange = (
     e:
       | React.ChangeEvent<HTMLInputElement>
@@ -46,9 +50,26 @@ const index = () => {
       [e.target.name]: e.target.value,
     }));
   };
-  const [date, setDate] = React.useState<Date>();
-  const [open, setOpen] = useState(false);
 
+  const saveProblem = async (url: string) => {
+    if (url) {
+      var id = v4();
+      await setDoc(doc(firestore, "/problems/" + id), {
+        ...userData,
+        id: id,
+        date: date,
+        coverURL: url,
+      });
+    }
+  };
+  const handleSubmit = async () => {
+    if (imgs != null) {
+      let url = await uploadFile(imgs[0]);
+      console.log(url);
+      await saveProblem(url);
+      setOpen(false);
+    }
+  };
   const uploadFile = async (file: File) => {
     console.log(file);
     const fileName = v4() + "_" + file.name;
@@ -136,11 +157,13 @@ const index = () => {
             </Popover>
             <Label htmlFor="picture">Picture</Label>
             <Input
-              id="picture"
+              id="coverURL"
               type="file"
-              name="picture"
+              name="coverURL"
+              accept="image/*"
               onChange={(e) => {
                 console.log(e.target.files);
+                setImgs(e.target.files);
               }}
             />
           </form>
@@ -148,7 +171,7 @@ const index = () => {
             <Button variant={"outline"} onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" onClick={() => navigate("/")}>
+            <Button type="submit" onClick={handleSubmit}>
               Save changes
             </Button>
           </DialogFooter>
