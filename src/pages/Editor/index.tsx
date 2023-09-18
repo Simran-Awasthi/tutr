@@ -1,18 +1,87 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import Editor from "@monaco-editor/react";
 import { emmetHTML, emmetCSS } from "emmet-monaco-es";
 import SplitPane from "react-split-pane";
+import { useSearchParams } from "react-router-dom";
+import {
+  DocumentData,
+  QueryDocumentSnapshot,
+  Timestamp,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  setDoc,
+  updateDoc,
+  where,
+} from "firebase/firestore";
+import { auth, db } from "@/firebase";
+
+import { v4 } from "uuid";
+import { debounce } from "lodash";
 
 const CodeEditor = () => {
-  const [content, setContent] = useState(`
-  
-  `);
+  const [content, setContent] = useState(``);
   const [html, setHtml] = useState("");
   const [css, setCss] = useState("");
   const [js, setJS] = useState("");
+  const [seachaPram, setSeachParam] = useSearchParams();
+  const [hasSubmission, setHasSubmission] = useState(false);
+  const [submission, setSubmission] = useState<string | null>(null);
 
+  const problemId = seachaPram.get("id");
+  const getSubmissions = async () => {
+    let q = query(
+      collection(db, "submissions"),
+      where("userId", "==", auth.currentUser?.uid),
+      where("problemId", "==", problemId)
+    );
+
+    const userDoc = await getDoc(
+      doc(
+        db,
+        "problems",
+        problemId || "",
+        "submissions",
+        auth.currentUser?.uid || ""
+      )
+    );
+    console.log(userDoc);
+    if (!userDoc.exists()) {
+      setHasSubmission(false);
+    } else {
+      setHasSubmission(true);
+      setSubmission(userDoc.id);
+      setHtml(userDoc.get("html"));
+      setCss(userDoc.get("css"));
+      setJS(userDoc.get("js"));
+    }
+  };
+
+  const saveSubmission = async () => {
+    console.log("saving...");
+    if (auth.currentUser && problemId)
+      await setDoc(
+        doc(db, "problems", problemId, "submissions", auth.currentUser.uid),
+        {
+          html: html,
+          css: css,
+          js: js,
+          lastUpdatedAt: Timestamp.now(),
+          isPublic: false,
+          isDraft: true,
+          problemId: problemId,
+          userId: auth.currentUser?.uid,
+        }
+      );
+  };
+  const deboucedSaveSubmission = debounce(() => saveSubmission(), 2000);
+  useEffect(() => {
+    getSubmissions();
+  }, [problemId]);
   const handleEditorDidMount = () => {
     emmetHTML((window as unknown as any).monaco);
     emmetCSS((window as unknown as any).monaco);
@@ -59,6 +128,7 @@ const CodeEditor = () => {
                 onMount={handleEditorDidMount}
                 onChange={(e) => {
                   setHtml(e ?? "");
+                  deboucedSaveSubmission();
                 }}
                 value={html}
                 defaultValue="<!-- some comment -->"
@@ -76,6 +146,7 @@ const CodeEditor = () => {
                 defaultLanguage="css"
                 onChange={(e) => {
                   setCss(e ?? "");
+                  deboucedSaveSubmission();
                 }}
                 value={css}
                 defaultValue="/* some comment */"
@@ -93,6 +164,7 @@ const CodeEditor = () => {
                 defaultLanguage="javascript"
                 onChange={(e) => {
                   setJS(e ?? "");
+                  deboucedSaveSubmission();
                 }}
                 value={js}
                 defaultValue="// some comment"

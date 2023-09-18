@@ -25,6 +25,7 @@ import {
   DocumentData,
   QueryDocumentSnapshot,
   collection,
+  doc,
   getDocs,
   query,
   where,
@@ -32,7 +33,7 @@ import {
 import { db } from "@/firebase";
 const Home = () => {
   const navigate = useNavigate();
-  const [date, setDate] = React.useState<Date | undefined>(new Date());
+  const [date, setDate] = React.useState<Date>(new Date(Date.now()));
   const [currentProblem, setCurrentProblem] = useState<QueryDocumentSnapshot<
     DocumentData,
     DocumentData
@@ -90,7 +91,7 @@ const Home = () => {
                   <Button
                     className="w-full"
                     onClick={() => {
-                      navigate("/editor ?id = {doc.id}");
+                      navigate(`/editor?id=${currentProblem.get("id")}`);
                     }}
                   >
                     Start Solving
@@ -111,7 +112,11 @@ const Home = () => {
         <Calendar
           mode="single"
           selected={date}
-          onSelect={setDate}
+          onSelect={(date) => {
+            if (date) {
+              setDate(date);
+            }
+          }}
           className="rounded-md border"
         ></Calendar>
       </div>

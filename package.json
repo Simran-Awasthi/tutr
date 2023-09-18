@@ -36,6 +36,7 @@
     "date-fns": "^2.30.0",
     "emmet-monaco-es": "^5.3.0",
     "firebase": "^10.3.1",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.274.0",
     "react": "^18.2.0",
     "react-day-picker": "^8.8.1",
@@ -49,6 +50,7 @@
     "zod": "^3.22.2"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.198",
     "@types/node": "^20.5.9",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
