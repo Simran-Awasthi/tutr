@@ -96,7 +96,12 @@ const Home = () => {
                   >
                     Start Solving
                   </Button>
-                  <Button className="w-full">View Submissions</Button>
+                  <Button
+                    className="w-full"
+                    onClick={() => navigate("/submission")}
+                  >
+                    View Submissions
+                  </Button>
                 </CardFooter>
               </Card>
             </article>

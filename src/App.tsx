@@ -6,6 +6,7 @@ import CodeEditor from "@/pages/Editor";
 import Auth from "./pages/Auth";
 import ProtectedRoute from "./components/ui/common/ProtectedRoute";
 import Admin from "./pages/Admin";
+import Submission from "./pages/Submission";
 function App() {
   return (
     <Routes>
@@ -27,6 +28,7 @@ function App() {
       ></Route>
       <Route path="/auth" element={<Auth />}></Route>
       <Route path="/admin" element={<Admin />}></Route>
+      <Route path="/submission" element={<Submission />}></Route>
     </Routes>
   );
 }
